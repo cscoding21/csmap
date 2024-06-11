@@ -32,6 +32,36 @@ Additionally, the runner can be installed on the target machine.  This is a wrap
 
     go install github.com/cscoding21/csval
 
+## How it Works
+CSMap uses Golang's AST package (abstracted by [CSGen](http://github.com/cscoding21/csgen)) to create mapping functions between two different objects.  The developer defines the mapping rules in the manifest file and the generator will create the mapping functions.  The developer can then use the mapping functions to map objects from one tier to another.
+
+The manifest file contains an array of files to map.  Each item contains two files...a source and a destination, along with some optional additional data to specify behavior.  
+
+CSMap reads the structs contained in each of the files and looks for definitions with the same name.  Alternately, if an override is specified, structs with different names can be mapped.
+
+The map generator creates one file for each source/destination pair in the manifest.  Within the file, there will be two functions for each mapped struct: one for a single object and the other for a slice.  For each field in the source...a field with the same name in the destination will be mapped __provided they are of a like data type__.  The mapping code will attempt to handle the following edge-cases for individual fields:
+
+- Mapping of an address/pointer to a value field and vice-versa
+- Mapping by calling a separate mapping function created by the mapper __in the same file__
+- Mapping of a type to a compatible type (e.g. string to custom def of type string)
+
+## Usage
+Once the mapping functions have been generated, they can be called in the following manner:
+
+    testSource := pkg1.Activity{
+		ID:       "121e",
+		Type:     "update",
+		Summary:  "Test activity",
+		Detail:   nil,
+		Context:  "Test context",
+		TargetID: &targetID,
+		Time:     time.Now(),
+		Key:      "Test key",
+	}
+
+	__testDest := tests.ActivityPkg1ToPkg2(testSource)__
+
+
 ## Manifest File
 The manifest file is a YAML file containing configuration parameters as well as a list of object maps to process.  The developer can pass in the name and location of the manifest file.  If nothing is specified, the generator will look for a file called __csmap.yaml__ in the current directory (from where the process is being run).
 
@@ -48,12 +78,20 @@ Below is a sample manifest file:
 
     # source and destination paths are relative to project root
     maps:
-    # Test of 2 objects with different names 
+    # A name for the map.  This is used as the root of the file name
     - name: "source_data1"
+
+      # A path to the file containing the source object
       source_path: "tests/diffnames/source_data1.go"
+
+      # A path to the file containing the target object
       target_path: "tests/diffnames/target_data1.go"
+
+      # A list of imports for the generated file.  The process calls __goimports__ during file generation, so this shouldn't ever be necessary 
       # imports: 
       # - "github.com/cscoding21/csgen"
+
+      # An array of object mapping names.  This is only necessary if the name of the source and target are different.  
       map_overrides:
       - source_name: "TestSource"
         target_name: "TestTarget"

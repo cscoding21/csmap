@@ -3,16 +3,26 @@ package gen
 import (
 	"os"
 	"path/filepath"
+	"slices"
 	"testing"
+	"time"
+
+	"github.com/cscoding21/csgen"
+	"github.com/cscoding21/csmap/tests"
+	"github.com/cscoding21/csmap/tests/pkg1"
+)
+
+const (
+	MANIFEST_PATH = "csmap.yaml"
 )
 
 func TestGenerate(t *testing.T) {
-	err := Generate("csmap.yaml")
+	err := Generate(MANIFEST_PATH)
 	if err != nil {
 		t.Error(err)
 	}
 
-	manifest := LoadManifest("csmap.yaml")
+	manifest := LoadManifest(MANIFEST_PATH)
 	expectedFiles := []string{
 		filepath.Join(manifest.ProjectRoot, manifest.GeneratorPath, "source_data1_csmap.gen.go"),
 		filepath.Join(manifest.ProjectRoot, manifest.GeneratorPath, "source_data2_csmap.gen.go"),
@@ -25,13 +35,95 @@ func TestGenerate(t *testing.T) {
 			t.Error(err)
 		}
 	}
-
-	//cleanup(expectedFiles)
 }
 
-func cleanup(files []string) {
-	for _, f := range files {
-		os.Remove(f)
+func TestFunctionsCreated(t *testing.T) {
+	manifest := LoadManifest(MANIFEST_PATH)
+	err := Generate(MANIFEST_PATH)
+	if err != nil {
+		t.Error(err)
+	}
+
+	testCases := []struct {
+		ok   bool
+		file string
+		want []string
+	}{
+		{ok: true, file: filepath.Join(manifest.ProjectRoot, manifest.GeneratorPath, "source_data1_csmap.gen.go"), want: []string{"TestSourceDiffnamesToDiffnames", "TestSourceDiffnamesToDiffnamesSlice", "LocationSourceDiffnamesToDiffnames", "LocationSourceDiffnamesToDiffnamesSlice"}},
+		{ok: true, file: filepath.Join(manifest.ProjectRoot, manifest.GeneratorPath, "source_data2_csmap.gen.go"), want: []string{"ActivityPkg1ToPkg2", "ActivityPkg1ToPkg2Slice", "ActivityResultsPkg1ToPkg2", "ActivityResultsPkg1ToPkg2Slice"}},
+		{ok: true, file: filepath.Join(manifest.ProjectRoot, manifest.GeneratorPath, "source_pkgco_csmap.gen.go"), want: []string{"PagingSourcePkgcoToPkgco", "PagingSourcePkgcoToPkgcoSlice"}},
+	}
+
+	for _, file := range testCases {
+		//---get a list of functions in the generated file
+		functions, err := csgen.GetFunctions(file.file)
+		if err != nil {
+			t.Error(err)
+			continue
+		}
+
+		fns := []string{}
+		for _, funcs := range functions {
+			fns = append(fns, funcs.Name)
+		}
+
+		//---ensure all of the functions that are expected have been created
+		if slices.Equal(fns, file.want) == false {
+			t.Errorf("Count of functions in %s is incorrect: expected %v, got %v", file.file, len(file.want), len(functions))
+		}
+	}
+}
+
+func TestMappingFunctions(t *testing.T) {
+	err := Generate(MANIFEST_PATH)
+	if err != nil {
+		t.Error(err)
+	}
+
+	targetID := "121b"
+	testSource := pkg1.Activity{
+		ID:       "121e",
+		Type:     "update",
+		Summary:  "Test activity",
+		Detail:   nil,
+		Context:  "Test context",
+		TargetID: &targetID,
+		Time:     time.Now(),
+		Key:      "Test key",
+	}
+
+	testDest := tests.ActivityPkg1ToPkg2(testSource)
+
+	if testDest.ID != testSource.ID {
+		t.Errorf("Mapped ID is incorrect: %s", testDest.ID)
+	}
+
+	if testDest.Type != testSource.Type {
+		t.Errorf("Mapped Type is incorrect: %s", testDest.Type)
+	}
+
+	if testDest.Summary != testSource.Summary {
+		t.Errorf("Mapped Summary is incorrect: %s", testDest.Summary)
+	}
+
+	if testDest.Detail != testSource.Detail {
+		t.Errorf("Mapped Detail is incorrect: %v", testDest.Detail)
+	}
+
+	if testDest.Context != testSource.Context {
+		t.Errorf("Mapped Context is incorrect: %s", testDest.Context)
+	}
+
+	if testDest.TargetID != testSource.TargetID {
+		t.Errorf("Mapped TargetID is incorrect: %v", testDest.TargetID)
+	}
+
+	if testDest.Time != testSource.Time {
+		t.Errorf("Mapped Time is incorrect: %s", testDest.Time)
+	}
+
+	if testDest.Key != string(testSource.Key) {
+		t.Errorf("Mapped Key is incorrect: %s", testDest.Key)
 	}
 }
 
