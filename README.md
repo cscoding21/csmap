@@ -10,8 +10,8 @@
     <a href="https://github.com/cscoding21/csmap/pulse" alt="Activity">
         <img src="https://img.shields.io/github/commit-activity/m/cscoding21/csmap?color=0052FF&labelColor=090422" /></a>
     <br />
-    <a href="https://discord.gg/BjV88Bys" alt="Discord">
-        <img src="https://img.shields.io/discord/1196192809120710779" /></a>&nbsp;
+    <!-- <a href="https://discord.gg/BjV88Bys" alt="Discord">
+        <img src="https://img.shields.io/discord/1196192809120710779" /></a>&nbsp; -->
     <a href="https://www.youtube.com/@CommonSenseCoding-ge5dn" alt="YouTube">
         <img src="https://img.shields.io/badge/youtube-watch_videos-red.svg?color=0052FF&labelColor=090422&logo=youtube" /></a>&nbsp;
     <a href="https://twitter.com/cscoding21" alt="YouTube">
@@ -48,6 +48,7 @@ The map generator creates one file for each source/destination pair in the manif
 ## Usage
 Once the mapping functions have been generated, they can be called in the following manner:
 
+    # Define the source object
     testSource := pkg1.Activity{
 		ID:       "121e",
 		Type:     "update",
@@ -59,7 +60,8 @@ Once the mapping functions have been generated, they can be called in the follow
 		Key:      "Test key",
 	}
 
-	__testDest := tests.ActivityPkg1ToPkg2(testSource)__
+    # Calling the generated function maps all of the connected fields
+	testDest := tests.ActivityPkg1ToPkg2(testSource)
 
 
 ## Manifest File
