@@ -14,6 +14,7 @@ type Activity struct {
 	Context  string    `json:"context"`
 	TargetID *string   `json:"targetID,omitempty"`
 	Time     time.Time `json:"time"`
+	Key      string
 	//Resource      *Resource      `json:"resource,omitempty"`
 	//ControlFields *ControlFields `json:"controlFields"`
 }

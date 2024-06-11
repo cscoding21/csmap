@@ -1,6 +1,8 @@
 package gen
 
 import (
+	"os"
+	"path/filepath"
 	"testing"
 )
 
@@ -9,10 +11,33 @@ func TestGenerate(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
+
+	manifest := LoadManifest("csmap.yaml")
+	expectedFiles := []string{
+		filepath.Join(manifest.ProjectRoot, manifest.GeneratorPath, "source_data1_csmap.gen.go"),
+		filepath.Join(manifest.ProjectRoot, manifest.GeneratorPath, "source_data2_csmap.gen.go"),
+		filepath.Join(manifest.ProjectRoot, manifest.GeneratorPath, "source_pkgco_csmap.gen.go"),
+	}
+
+	for _, file := range expectedFiles {
+		_, err := os.Stat(file)
+		if err != nil {
+			t.Error(err)
+		}
+	}
+
+	//cleanup(expectedFiles)
+}
+
+func cleanup(files []string) {
+	for _, f := range files {
+		os.Remove(f)
+	}
 }
 
 func TestLoadManifest(t *testing.T) {
-	manifest := LoadManifest("manifest.yaml")
+	manifest := LoadManifest("csmap.yaml")
+	expectedMapCount := 3
 
 	if manifest.ProjectRoot != "/home/jeph/projects/cscoding21/csmap" {
 		t.Errorf("ProjectRoot is incorrect: %s", manifest.ProjectRoot)
@@ -26,7 +51,7 @@ func TestLoadManifest(t *testing.T) {
 		t.Errorf("GeneratorPackage is incorrect: %s", manifest.GeneratorPackage)
 	}
 
-	if len(manifest.ObjectMaps) != 1 {
-		t.Errorf("Count of ObjectMaps is incorrect: expected 2, got %v", len(manifest.ObjectMaps))
+	if len(manifest.ObjectMaps) != expectedMapCount {
+		t.Errorf("Count of ObjectMaps is incorrect: expected %v, got %v", expectedMapCount, len(manifest.ObjectMaps))
 	}
 }

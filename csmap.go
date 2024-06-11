@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	filePath := flag.String("f", "manifest.yaml", "path to the manifest file")
+	filePath := flag.String("f", "csmap.yaml", "path to the manifest file")
 	flag.Parse()
 
 	err := gen.Generate(*filePath)

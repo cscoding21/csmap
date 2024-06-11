@@ -1,9 +1,9 @@
-package tests
+package diffnames
 
 type TestSource struct {
 	ID       string
 	Name     string
-	Age      int
+	Age      *int
 	Location LocationSource
 }
 

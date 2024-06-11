@@ -5,7 +5,6 @@ import (
 
 	"log"
 	"os"
-	"path"
 	"path/filepath"
 	"strings"
 
@@ -18,16 +17,11 @@ import (
 
 // Generate generates the mapping files.
 func Generate(manifestPath string) error {
-	currentPath, err := os.Getwd()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	mp := path.Join(currentPath, manifestPath)
+	mp := getManifestPath(manifestPath)
 	manifest := LoadManifest(mp)
 
 	outPath := filepath.Join(manifest.ProjectRoot, manifest.GeneratorPath)
-	err = os.MkdirAll(outPath, os.ModePerm)
+	err := os.MkdirAll(outPath, os.ModePerm)
 	if err != nil {
 		log.Fatal(err)
 		return err
@@ -240,32 +234,6 @@ func getConversionFunction(name string, template string, p ConvertFunctionParams
 	return out
 }
 
-func getConversionFunctionParams(
-	converterPackage string,
-	targetObjectName string,
-	targetPackageName string,
-	sourceObjectName string,
-	sourcePackageName string,
-	imports []string,
-	assignments []string) ConvertFunctionParams {
-
-	params := ConvertFunctionParams{
-		ConverterPackage:     converterPackage,
-		FunctionName:         getConversionFunctionName(sourceObjectName, sourcePackageName, targetPackageName),
-		FunctionNameForSlice: getConversionFunctionNameToSlice(sourceObjectName, sourcePackageName, targetPackageName),
-		SourcePackage:        sourcePackageName,
-		SourceObjectName:     sourceObjectName,
-		FQSourceObjectName:   getFQObjectName(converterPackage, sourcePackageName, sourceObjectName),
-		TargetPackage:        targetPackageName,
-		TargetObjectName:     targetObjectName,
-		FQTargetObjectName:   getFQObjectName(converterPackage, targetPackageName, targetObjectName),
-		Imports:              imports,
-		Assignments:          assignments,
-	}
-
-	return params
-}
-
 // LoadManifest loads the manifest file and returns a slice of ObjectMap structs.
 func LoadManifest(path string) Manifest {
 	log.Printf("Loading manifest file: %s\n", path)
@@ -276,9 +244,12 @@ func LoadManifest(path string) Manifest {
 
 	var manifest Manifest
 	err = yaml.Unmarshal(yfile, &manifest)
-
 	if err != nil {
 		log.Fatal(err)
+	}
+
+	if len(manifest.GeneratorPackage) == 0 {
+		manifest.GeneratorPackage = inferPackageFromOutputPath(manifest.GeneratorPath)
 	}
 
 	for i, m := range manifest.ObjectMaps {

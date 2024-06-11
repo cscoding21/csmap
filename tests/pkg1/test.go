@@ -6,6 +6,8 @@ import (
 	"github.com/cscoding21/csmap/tests/pkgco"
 )
 
+type TestKey string
+
 type Activity struct {
 	ID       string    `json:"id"`
 	Type     string    `json:"type"`
@@ -14,6 +16,7 @@ type Activity struct {
 	Context  string    `json:"context"`
 	TargetID *string   `json:"targetID,omitempty"`
 	Time     time.Time `json:"time"`
+	Key      TestKey   `json:"key"`
 	//Resource      *Resource      `json:"resource,omitempty"`
 	//ControlFields *ControlFields `json:"controlFields"`
 }

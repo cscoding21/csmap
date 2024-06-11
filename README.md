@@ -28,3 +28,34 @@ To install the CSMap package...run the following command:
 
     go get github.com/cscoding21/csmap
 
+Additionally, the runner can be installed on the target machine.  This is a wrapper executable that accepts a file location for the manifest file and processes the defined maps.
+
+    go install github.com/cscoding21/csval
+
+## Manifest File
+The manifest file is a YAML file containing configuration parameters as well as a list of object maps to process.  The developer can pass in the name and location of the manifest file.  If nothing is specified, the generator will look for a file called __csmap.yaml__ in the current directory (from where the process is being run).
+
+Below is a sample manifest file:
+
+    # The root of the project
+    project_root: "/home/jeph/projects/cscoding21/csmap"
+
+    # The relative path to the root where generated output will go
+    generator_path: "tests"
+
+    # An optional value for the package name of generated files.  If not specified, the name of the directory containing the generated output will be used.
+    # generator_package: "tests"
+
+    # source and destination paths are relative to project root
+    maps:
+    # Test of 2 objects with different names 
+    - name: "source_data1"
+      source_path: "tests/diffnames/source_data1.go"
+      target_path: "tests/diffnames/target_data1.go"
+      # imports: 
+      # - "github.com/cscoding21/csgen"
+      map_overrides:
+      - source_name: "TestSource"
+        target_name: "TestTarget"
+      - source_name: "LocationSource"
+        target_name: "LocationTarget"

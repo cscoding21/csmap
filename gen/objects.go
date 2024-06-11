@@ -12,6 +12,7 @@ type Manifest struct {
 	ObjectMaps       []ObjectMap `yaml:"maps"`
 }
 
+// MapOverride struct that represents an explicitly specified object mapping, overriding the defailt name matching
 type MapOverride struct {
 	SourceName string `yaml:"source_name"`
 	TargetName string `yaml:"target_name"`
@@ -41,4 +42,30 @@ type ConvertFunctionParams struct {
 	FQTargetObjectName   string
 	Assignments          []string
 	Imports              []string
+}
+
+func getConversionFunctionParams(
+	converterPackage string,
+	targetObjectName string,
+	targetPackageName string,
+	sourceObjectName string,
+	sourcePackageName string,
+	imports []string,
+	assignments []string) ConvertFunctionParams {
+
+	params := ConvertFunctionParams{
+		ConverterPackage:     converterPackage,
+		FunctionName:         getConversionFunctionName(sourceObjectName, sourcePackageName, targetPackageName),
+		FunctionNameForSlice: getConversionFunctionNameToSlice(sourceObjectName, sourcePackageName, targetPackageName),
+		SourcePackage:        sourcePackageName,
+		SourceObjectName:     sourceObjectName,
+		FQSourceObjectName:   getFQObjectName(converterPackage, sourcePackageName, sourceObjectName),
+		TargetPackage:        targetPackageName,
+		TargetObjectName:     targetObjectName,
+		FQTargetObjectName:   getFQObjectName(converterPackage, targetPackageName, targetObjectName),
+		Imports:              imports,
+		Assignments:          assignments,
+	}
+
+	return params
 }

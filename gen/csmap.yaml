@@ -1,13 +1,13 @@
 project_root: "/home/jeph/projects/cscoding21/csmap"
 generator_path: "tests"
-generator_package: "tests"
+#generator_package: "tests"
 
 # source and destination pathes are relative to project root
 maps:
   # Test of 2 objects with different names 
   - name: "source_data1"
-    source_path: "tests/source_data1.go"
-    target_path: "tests/target_data1.go"
+    source_path: "tests/diffnames/source_data1.go"
+    target_path: "tests/diffnames/target_data1.go"
     # imports: 
     # - "github.com/cscoding21/csgen"
     map_overrides:
@@ -21,37 +21,10 @@ maps:
     source_path: "tests/pkg1/test.go"
     target_path: "tests/pkg2/test.go"
 
+  # Test of mapping 2 identical objects in the same package
   - name: "source_pkgco"
     source_path: "tests/pkgco/com.go"
     target_path: "tests/pkgco/com2.go"
     map_overrides:
     - source_name: "PagingSource"
       target_name: "PagingTarget"
-
-  # - name: "project_update"
-  #   source_path: "cmd/server/graph/model/models_gen.go"
-  #   target_path: "internal/services/project/models/project.go"
-  #   imports: 
-  #   - "analyzer/internal/services/project/models"
-  #   - "analyzer/internal/shared/utils"
-  #   - "analyzer/internal/services/project/types/milestonestatus"
-  #   - "analyzer/internal/services/project/types/featurepriority"
-  #   map_overrides:
-  #   - source_name: "UpdateProject"
-  #     target_name: "Project"
-  #   - source_name: "UpdateProjectBasics"
-  #     target_name: "ProjectBasics"
-  #   - source_name: "UpdateProjectValue"
-  #     target_name: "ProjectValue"
-  #   - source_name: "UpdateProjectCost"
-  #     target_name: "ProjectCost"
-  #   - source_name: "UpdateProjectDaci"
-  #     target_name: "ProjectDaci"
-  #   - source_name: "UpdateProjectFeature"
-  #     target_name: "ProjectFeature"
-  #   - source_name: "UpdateProjectMilestone"
-  #     target_name: "ProjectMilestone"
-  #   - source_name: "UpdateProjectMilestoneTask"
-  #     target_name: "ProjectMilestoneTask"
-  #   - source_name: "UpdateProjectMilestonePhase"
-  #     target_name: "ProjectMilestonePhase"

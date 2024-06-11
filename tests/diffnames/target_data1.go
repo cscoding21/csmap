@@ -1,8 +1,8 @@
-package tests
+package diffnames
 
 type TestTarget struct {
 	ID       string
-	Name     string
+	Name     *string
 	Age      int
 	Location LocationTarget
 }
