@@ -1,3 +1,9 @@
+## v0.2.2 (2024-06-13)
+
+### Fix
+
+- update to conform with go standards and fix tests
+
 ## v0.2.1 (2024-06-13)
 
 ### Fix
