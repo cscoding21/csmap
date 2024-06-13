@@ -10,23 +10,24 @@ import (
 	"github.com/cscoding21/csgen"
 	"github.com/cscoding21/csmap/tests"
 	"github.com/cscoding21/csmap/tests/pkg1"
+	//"github.com/cscoding21/csmap/tests"
 )
 
 const (
-	MANIFEST_PATH = "csmap.yaml"
+	ManifestPath = "csmap.yaml"
 )
 
 func TestGenerate(t *testing.T) {
-	err := Generate(MANIFEST_PATH)
+	err := Generate(ManifestPath)
 	if err != nil {
 		t.Error(err)
 	}
 
-	manifest := LoadManifest(MANIFEST_PATH)
+	manifest := LoadManifest(ManifestPath)
 	expectedFiles := []string{
-		filepath.Join(manifest.ProjectRoot, manifest.GeneratorPath, "source_data1_csmap.gen.go"),
-		filepath.Join(manifest.ProjectRoot, manifest.GeneratorPath, "source_data2_csmap.gen.go"),
-		filepath.Join(manifest.ProjectRoot, manifest.GeneratorPath, "source_pkgco_csmap.gen.go"),
+		filepath.Join(manifest.ProjectRoot, manifest.GeneratorPath, "z_source_data1_csmap.gen.go"),
+		filepath.Join(manifest.ProjectRoot, manifest.GeneratorPath, "z_source_data2_csmap.gen.go"),
+		filepath.Join(manifest.ProjectRoot, manifest.GeneratorPath, "z_source_pkgco_csmap.gen.go"),
 	}
 
 	for _, file := range expectedFiles {
@@ -38,8 +39,8 @@ func TestGenerate(t *testing.T) {
 }
 
 func TestFunctionsCreated(t *testing.T) {
-	manifest := LoadManifest(MANIFEST_PATH)
-	err := Generate(MANIFEST_PATH)
+	manifest := LoadManifest(ManifestPath)
+	err := Generate(ManifestPath)
 	if err != nil {
 		t.Error(err)
 	}
@@ -49,9 +50,9 @@ func TestFunctionsCreated(t *testing.T) {
 		file string
 		want []string
 	}{
-		{ok: true, file: filepath.Join(manifest.ProjectRoot, manifest.GeneratorPath, "source_data1_csmap.gen.go"), want: []string{"TestSourceDiffnamesToDiffnames", "TestSourceDiffnamesToDiffnamesSlice", "LocationSourceDiffnamesToDiffnames", "LocationSourceDiffnamesToDiffnamesSlice"}},
-		{ok: true, file: filepath.Join(manifest.ProjectRoot, manifest.GeneratorPath, "source_data2_csmap.gen.go"), want: []string{"ActivityPkg1ToPkg2", "ActivityPkg1ToPkg2Slice", "ActivityResultsPkg1ToPkg2", "ActivityResultsPkg1ToPkg2Slice"}},
-		{ok: true, file: filepath.Join(manifest.ProjectRoot, manifest.GeneratorPath, "source_pkgco_csmap.gen.go"), want: []string{"PagingSourcePkgcoToPkgco", "PagingSourcePkgcoToPkgcoSlice"}},
+		{ok: true, file: filepath.Join(manifest.ProjectRoot, manifest.GeneratorPath, "z_source_data1_csmap.gen.go"), want: []string{"TestSourceDiffnamesToDiffnames", "TestSourceDiffnamesToDiffnamesSlice", "LocationSourceDiffnamesToDiffnames", "LocationSourceDiffnamesToDiffnamesSlice"}},
+		{ok: true, file: filepath.Join(manifest.ProjectRoot, manifest.GeneratorPath, "z_source_data2_csmap.gen.go"), want: []string{"ActivityPkg1ToPkg2", "ActivityPkg1ToPkg2Slice", "ActivityResultsPkg1ToPkg2", "ActivityResultsPkg1ToPkg2Slice"}},
+		{ok: true, file: filepath.Join(manifest.ProjectRoot, manifest.GeneratorPath, "z_source_pkgco_csmap.gen.go"), want: []string{"PagingSourcePkgcoToPkgco", "PagingSourcePkgcoToPkgcoSlice"}},
 	}
 
 	for _, file := range testCases {
@@ -75,7 +76,7 @@ func TestFunctionsCreated(t *testing.T) {
 }
 
 func TestMappingFunctions(t *testing.T) {
-	err := Generate(MANIFEST_PATH)
+	err := Generate(ManifestPath)
 	if err != nil {
 		t.Error(err)
 	}

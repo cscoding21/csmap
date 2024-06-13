@@ -4,5 +4,7 @@ cov:
 	go tool cover -html=c.out;
 	
 qual:
-	go vet . && \
-	golint .;
+	go fmt -x  ./... && \
+	golint . && \
+	go vet ./... && \
+	go test ./...;

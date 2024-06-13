@@ -23,8 +23,8 @@ maps:
 
   # Test of mapping 2 identical objects in the same package
   - name: "source_pkgco"
-    source_path: "tests/pkgco/com.go"
-    target_path: "tests/pkgco/com2.go"
+    source_path: "tests/pkgco/test1.go"
+    target_path: "tests/pkgco/test2.go"
     map_overrides:
     - source_name: "PagingSource"
       target_name: "PagingTarget"
