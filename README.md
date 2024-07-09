@@ -30,7 +30,7 @@ To install the CSMap package...run the following command:
 
 Additionally, the runner can be installed on the target machine.  This is a wrapper executable that accepts a file location for the manifest file and processes the defined maps.
 
-    go install github.com/cscoding21/csval
+    go install github.com/cscoding21/csmap
 
 ## How it Works
 CSMap uses Golang's AST package (abstracted by [CSGen](http://github.com/cscoding21/csgen)) to create mapping functions between two different objects.  The developer defines the mapping rules in the manifest file and the generator will create the mapping functions.  The developer can then use the mapping functions to map objects from one tier to another.

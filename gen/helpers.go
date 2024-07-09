@@ -43,16 +43,7 @@ func getManifestPath(manifestPath ...string) string {
 		if path.IsAbs(mp) {
 			pwd = ""
 		}
-	} else {
 	}
 
 	return path.Join(pwd, mp)
-}
-
-func inferPackageFromOutputPath(outPath string) string {
-	root, dir := path.Split(outPath)
-
-	log.Println(root, dir)
-
-	return dir
 }

@@ -33,22 +33,3 @@ func TestGetManifestPath(t *testing.T) {
 		}
 	}
 }
-
-func TestInferPackageFromOutputPath(t *testing.T) {
-	testCases := []struct {
-		ok   bool
-		have string
-		want string
-	}{
-		{ok: true, have: "cmd/tests", want: "tests"},
-		{ok: true, have: "/usr/blah/foo/bar", want: "bar"},
-		{ok: true, have: "./bar", want: "bar"},
-		{ok: true, have: "../bar", want: "bar"},
-	}
-
-	for _, testCase := range testCases {
-		if want := inferPackageFromOutputPath(testCase.have); want != testCase.want {
-			t.Errorf("inferPackageFromOutputPath failed: expected %s, got %s", testCase.want, want)
-		}
-	}
-}

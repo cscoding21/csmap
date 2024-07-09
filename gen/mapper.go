@@ -249,7 +249,7 @@ func LoadManifest(path string) Manifest {
 	}
 
 	if len(manifest.GeneratorPackage) == 0 {
-		manifest.GeneratorPackage = inferPackageFromOutputPath(manifest.GeneratorPath)
+		manifest.GeneratorPackage = csgen.InferPackageFromOutputPath(manifest.GeneratorPath)
 	}
 
 	for i, m := range manifest.ObjectMaps {
