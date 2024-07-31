@@ -1,3 +1,13 @@
+## v0.3.0 (2024-07-31)
+
+### Feat
+
+- add handling for specifying import files
+
+### Refactor
+
+- update csgen package and update docs
+
 ## v0.2.2 (2024-06-13)
 
 ### Fix
