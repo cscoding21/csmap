@@ -8,8 +8,8 @@ maps:
   - name: "source_data1"
     source_path: "tests/diffnames/source_data1.go"
     target_path: "tests/diffnames/target_data1.go"
-    # imports: 
-    # - "github.com/cscoding21/csgen"
+    imports: 
+    - "github.com/cscoding21/csgen"
     map_overrides:
     - source_name: "TestSource"
       target_name: "TestTarget"

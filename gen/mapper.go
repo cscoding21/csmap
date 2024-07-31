@@ -30,6 +30,8 @@ func Generate(manifestPath string) error {
 	for _, m := range manifest.ObjectMaps {
 		builder := csgen.NewCSGenBuilderForFile("csmap", manifest.GeneratorPackage)
 
+		builder.WriteString(buildImports(m.Imports))
+
 		for _, targetStruct := range m.TargetObjects {
 			sourceObjectName := getSourceObjectName(targetStruct.Name, m.MapOverrides)
 			sourceStruct := objectSliceContainsName(sourceObjectName, m.SourceObjects)
@@ -261,6 +263,24 @@ func LoadManifest(path string) Manifest {
 	}
 
 	return manifest
+}
+
+func buildImports(imports []string) string {
+	if len(imports) == 0 {
+		return ""
+	}
+
+	builder := strings.Builder{}
+	builder.WriteString("import (\n")
+
+	for _, imp := range imports {
+		builder.WriteString(fmt.Sprintf(`"%s"`, imp))
+		builder.WriteString("\n")
+	}
+
+	builder.WriteString(")\n")
+
+	return builder.String()
 }
 
 var functionTemplate = `
