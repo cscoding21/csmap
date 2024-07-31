@@ -21,7 +21,7 @@
 
 
 # CSMap
-CSVal is a Golang package that generates functions that map values from one object to another.  The primary use-case is to allow objects from the one tier (e.g. [DTOs](https://en.wikipedia.org/wiki/Data_transfer_object)) to be mapped to objects at the business/service layer.  Because the mapping code is generated pre-compilation, reflection is not required.
+CSMap is a Golang package that generates functions that copy values from one object type to another.  The primary use-case is to allow objects from the one tier (e.g. [DTOs](https://en.wikipedia.org/wiki/Data_transfer_object)) to be mapped to objects at the business/service layer.  Because the mapping code is generated pre-compilation, reflection is not required.
 
 ## Installation
 To install the CSMap package...run the following command:
