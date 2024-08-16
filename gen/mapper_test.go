@@ -10,7 +10,7 @@ import (
 	"github.com/cscoding21/csgen"
 	"github.com/cscoding21/csmap/tests"
 	"github.com/cscoding21/csmap/tests/pkg1"
-	//"github.com/cscoding21/csmap/tests"
+	"golang.org/x/tools/go/packages"
 )
 
 const (
@@ -18,12 +18,13 @@ const (
 )
 
 func TestGenerate(t *testing.T) {
-	err := Generate(ManifestPath)
+	mcfg := getTestModuleConfig()
+	err := Generate(ManifestPath, mcfg)
 	if err != nil {
 		t.Error(err)
 	}
 
-	manifest := LoadManifest(ManifestPath)
+	manifest := LoadManifest(ManifestPath, mcfg)
 	expectedFiles := []string{
 		filepath.Join(manifest.ProjectRoot, manifest.GeneratorPath, "z_source_data1_csmap.gen.go"),
 		filepath.Join(manifest.ProjectRoot, manifest.GeneratorPath, "z_source_data2_csmap.gen.go"),
@@ -39,8 +40,9 @@ func TestGenerate(t *testing.T) {
 }
 
 func TestFunctionsCreated(t *testing.T) {
-	manifest := LoadManifest(ManifestPath)
-	err := Generate(ManifestPath)
+	mcfg := getTestModuleConfig()
+	manifest := LoadManifest(ManifestPath, mcfg)
+	err := Generate(ManifestPath, mcfg)
 	if err != nil {
 		t.Error(err)
 	}
@@ -68,6 +70,10 @@ func TestFunctionsCreated(t *testing.T) {
 			fns = append(fns, funcs.Name)
 		}
 
+		//---the comparison needs elements to be in the same order
+		slices.Sort(fns)
+		slices.Sort(file.want)
+
 		//---ensure all of the functions that are expected have been created
 		if slices.Equal(fns, file.want) == false {
 			t.Errorf("Count of functions in %s is incorrect: expected %v, got %v", file.file, len(file.want), len(functions))
@@ -76,7 +82,8 @@ func TestFunctionsCreated(t *testing.T) {
 }
 
 func TestMappingFunctions(t *testing.T) {
-	err := Generate(ManifestPath)
+	mcfg := getTestModuleConfig()
+	err := Generate(ManifestPath, mcfg)
 	if err != nil {
 		t.Error(err)
 	}
@@ -129,7 +136,9 @@ func TestMappingFunctions(t *testing.T) {
 }
 
 func TestLoadManifest(t *testing.T) {
-	manifest := LoadManifest("csmap.yaml")
+	mcfg := getTestModuleConfig()
+
+	manifest := LoadManifest("csmap.yaml", mcfg)
 	expectedMapCount := 3
 
 	if manifest.ProjectRoot != "/home/jeph/projects/cscoding21/csmap" {
@@ -147,4 +156,11 @@ func TestLoadManifest(t *testing.T) {
 	if len(manifest.ObjectMaps) != expectedMapCount {
 		t.Errorf("Count of ObjectMaps is incorrect: expected %v, got %v", expectedMapCount, len(manifest.ObjectMaps))
 	}
+}
+
+func getTestModuleConfig() *packages.Config {
+	cfg := csgen.GetDefaultPackageConfig()
+	cfg.Dir = "../."
+	cfg.Tests = true
+	return cfg
 }

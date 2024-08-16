@@ -12,13 +12,14 @@ import (
 
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
+	"golang.org/x/tools/go/packages"
 	"gopkg.in/yaml.v3"
 )
 
 // Generate generates the mapping files.
-func Generate(manifestPath string) error {
+func Generate(manifestPath string, mcfg *packages.Config) error {
 	mp := getManifestPath(manifestPath)
-	manifest := LoadManifest(mp)
+	manifest := LoadManifest(mp, mcfg)
 
 	outPath := filepath.Join(manifest.ProjectRoot, manifest.GeneratorPath)
 	err := os.MkdirAll(outPath, os.ModePerm)
@@ -52,7 +53,8 @@ func Generate(manifestPath string) error {
 				[]string{})
 
 			props := []string{}
-			for _, targetField := range targetStruct.Fields {
+			allFields := targetStruct.Fields
+			for _, targetField := range allFields {
 				sourceField := sourceStruct.GetField(targetField.Name)
 				if sourceField == nil {
 					log.Printf("XXX No corresponding source field found for target field: %s\n", targetField.Name)
@@ -61,18 +63,26 @@ func Generate(manifestPath string) error {
 
 				log.Printf("----- Corresponding Source Field Found: %s --- %s\n", targetField.Name, sourceField.Name)
 
-				if targetField.IsSlice {
-					if targetField.IsPrimitive {
-						props = append(props, getSimpleAssignmentSlice(*sourceField, targetField))
-					} else {
-						props = append(props, getObjectAssignmentSlice(*sourceField, targetField, sourceStruct.Package, targetStruct.Package))
+				line := getAssignmentString(*sourceStruct, targetStruct, sourceField, targetField)
+				props = append(props, line)
+			}
+
+			if len(targetStruct.EmbeddedStructs) > 0 {
+				for _, embeddedStruct := range targetStruct.EmbeddedStructs {
+					em := strings.Builder{}
+					em.WriteString("\n\n//---Embedded Structs\n")
+					// PagingTargetEmbedded: pkgco.PagingTargetEmbedded{
+					em.WriteString(fmt.Sprintf("%s: %s.%s {\n", embeddedStruct.Name, embeddedStruct.Package, embeddedStruct.Name))
+
+					for _, embeddedField := range embeddedStruct.Fields {
+						embeddedSourceField := sourceStruct.GetField(embeddedField.Name)
+						line := fmt.Sprintf("%s,\n", getAssignmentString(*sourceStruct, embeddedStruct, embeddedSourceField, embeddedField))
+						em.WriteString(line)
 					}
-				} else {
-					if targetField.IsPrimitive {
-						props = append(props, getSimpleAssignment(*sourceField, targetField))
-					} else {
-						props = append(props, getObjectAssignment(*sourceField, targetField, sourceStruct.Package, targetStruct.Package))
-					}
+
+					em.WriteString("}")
+
+					props = append(props, em.String())
 				}
 			}
 
@@ -95,6 +105,32 @@ func Generate(manifestPath string) error {
 		}
 	}
 	return nil
+}
+
+func getAssignmentString(
+	sourceStruct csgen.Struct,
+	targetStruct csgen.Struct,
+	sourceField *csgen.Field,
+	targetField csgen.Field,
+) string {
+
+	builder := strings.Builder{}
+
+	if targetField.IsSlice {
+		if targetField.IsPrimitive {
+			builder.WriteString(getSimpleAssignmentSlice(*sourceField, targetField))
+		} else {
+			builder.WriteString(getObjectAssignmentSlice(*sourceField, targetField, sourceStruct.Package, targetStruct.Package))
+		}
+	} else {
+		if targetField.IsPrimitive {
+			builder.WriteString(getSimpleAssignment(*sourceField, targetField))
+		} else {
+			builder.WriteString(getObjectAssignment(*sourceField, targetField, sourceStruct.Package, targetStruct.Package))
+		}
+	}
+
+	return builder.String()
 }
 
 func objectSliceContainsName(name string, graph []csgen.Struct) *csgen.Struct {
@@ -146,8 +182,8 @@ func getSimpleAssignmentSlice(source csgen.Field, target csgen.Field) string {
 }
 
 func getObjectAssignment(source csgen.Field, target csgen.Field, sourcePackage string, targetPackage string) string {
-	targetTypeLocal := target.Type
-	sourceTypeLocal := source.Type
+	targetTypeLocal := target.GetCleanedType()
+	sourceTypeLocal := source.GetCleanedType()
 
 	convertToVal := csgen.IsRefType(sourceTypeLocal)
 
@@ -159,7 +195,7 @@ func getObjectAssignment(source csgen.Field, target csgen.Field, sourcePackage s
 	log.Printf("COERCE TYPE: %v\n", coerceType)
 
 	targetPropertyName := csgen.GetRawType(target.Name)
-	rawTargetName := csgen.GetRawType(target.Type)
+	rawTargetName := csgen.GetRawType(target.GetCleanedType())
 	objectPackage := csgen.ExtractPackageName(rawTargetName)
 
 	if len(objectPackage) > 0 {
@@ -167,7 +203,7 @@ func getObjectAssignment(source csgen.Field, target csgen.Field, sourcePackage s
 		targetPackage = objectPackage
 	}
 
-	strippedSourceName := csgen.GetRawType(csgen.StripPackageName(source.Type))
+	strippedSourceName := csgen.GetRawType(csgen.StripPackageName(source.GetCleanedType()))
 	funcName := getConversionFunctionName(strippedSourceName, sourcePackage, targetPackage)
 
 	if coerceType {
@@ -237,7 +273,7 @@ func getConversionFunction(name string, template string, p ConvertFunctionParams
 }
 
 // LoadManifest loads the manifest file and returns a slice of ObjectMap structs.
-func LoadManifest(path string) Manifest {
+func LoadManifest(path string, mcfg *packages.Config) Manifest {
 	log.Printf("Loading manifest file: %s\n", path)
 	yfile, err := os.ReadFile(path)
 	if err != nil {
@@ -255,11 +291,28 @@ func LoadManifest(path string) Manifest {
 	}
 
 	for i, m := range manifest.ObjectMaps {
-		sourcePath := filepath.Join(manifest.ProjectRoot, m.SourcePath)
-		targetPath := filepath.Join(manifest.ProjectRoot, m.TargetPath)
+		fmt.Println("-----------------------------------------------")
+		codeModule, err := csgen.LoadModule(mcfg, m.SourcePath)
+		if err != nil {
+			log.Fatal(err)
+		}
 
-		manifest.ObjectMaps[i].SourceObjects, _ = csgen.GetStructs(sourcePath)
-		manifest.ObjectMaps[i].TargetObjects, _ = csgen.GetStructs(targetPath)
+		for _, s := range codeModule.Packages[0].Structs {
+			fmt.Println(s.Name)
+
+			for _, f := range s.Fields {
+				fmt.Printf("--- %s (%s)\n", f.Name, f.GetCleanedType())
+			}
+		}
+
+		manifest.ObjectMaps[i].SourceObjects = codeModule.Packages[0].Structs
+
+		codeModule, err = csgen.LoadModule(mcfg, m.TargetPath)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		manifest.ObjectMaps[i].TargetObjects = codeModule.Packages[0].Structs
 	}
 
 	return manifest
