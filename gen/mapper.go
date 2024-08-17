@@ -68,15 +68,19 @@ func Generate(manifestPath string, mcfg *packages.Config) error {
 			}
 
 			if len(targetStruct.EmbeddedStructs) > 0 {
-				for _, embeddedStruct := range targetStruct.EmbeddedStructs {
+				log.Printf("Processing embedded structs\n")
+				for _, embeddedTargetStruct := range targetStruct.EmbeddedStructs {
+					log.Printf("- Embedded struct %s\n", embeddedTargetStruct.Name)
+
 					em := strings.Builder{}
 					em.WriteString("\n\n//---Embedded Structs\n")
 					// PagingTargetEmbedded: pkgco.PagingTargetEmbedded{
-					em.WriteString(fmt.Sprintf("%s: %s.%s {\n", embeddedStruct.Name, embeddedStruct.Package, embeddedStruct.Name))
+					em.WriteString(fmt.Sprintf("%s: %s.%s {\n", embeddedTargetStruct.Name, embeddedTargetStruct.Package, embeddedTargetStruct.Name))
 
-					for _, embeddedField := range embeddedStruct.Fields {
-						embeddedSourceField := sourceStruct.GetField(embeddedField.Name)
-						line := fmt.Sprintf("%s,\n", getAssignmentString(*sourceStruct, embeddedStruct, embeddedSourceField, embeddedField))
+					for _, embeddedTargetField := range embeddedTargetStruct.Fields {
+						embeddedSourceField := sourceStruct.GetField(embeddedTargetField.Name)
+						log.Printf("- Found embedded source field %s\n", embeddedSourceField.Name)
+						line := fmt.Sprintf("%s,\n", getAssignmentString(*sourceStruct, embeddedTargetStruct, embeddedSourceField, embeddedTargetField))
 						em.WriteString(line)
 					}
 
@@ -84,6 +88,8 @@ func Generate(manifestPath string, mcfg *packages.Config) error {
 
 					props = append(props, em.String())
 				}
+			} else {
+				log.Printf("XXX No embedded structs to process\n")
 			}
 
 			params.Assignments = props

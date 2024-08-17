@@ -54,7 +54,7 @@ func TestFunctionsCreated(t *testing.T) {
 	}{
 		{ok: true, file: filepath.Join(manifest.ProjectRoot, manifest.GeneratorPath, "z_source_data1_csmap.gen.go"), want: []string{"TestSourceDiffnamesToDiffnames", "TestSourceDiffnamesToDiffnamesSlice", "LocationSourceDiffnamesToDiffnames", "LocationSourceDiffnamesToDiffnamesSlice"}},
 		{ok: true, file: filepath.Join(manifest.ProjectRoot, manifest.GeneratorPath, "z_source_data2_csmap.gen.go"), want: []string{"ActivityPkg1ToPkg2", "ActivityPkg1ToPkg2Slice", "ActivityResultsPkg1ToPkg2", "ActivityResultsPkg1ToPkg2Slice"}},
-		{ok: true, file: filepath.Join(manifest.ProjectRoot, manifest.GeneratorPath, "z_source_pkgco_csmap.gen.go"), want: []string{"PagingSourcePkgcoToPkgco", "PagingSourcePkgcoToPkgcoSlice"}},
+		{ok: true, file: filepath.Join(manifest.ProjectRoot, manifest.GeneratorPath, "z_source_pkgco_csmap.gen.go"), want: []string{"PagingSourcePkgcoToPkgco", "PagingSourcePkgcoToPkgcoSlice", "PagingSourceTwoPkgcoToPkgco", "PagingSourceTwoPkgcoToPkgcoSlice"}},
 	}
 
 	for _, file := range testCases {

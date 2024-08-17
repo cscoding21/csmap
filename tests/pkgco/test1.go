@@ -13,3 +13,13 @@ type PagingSourceEmbedded struct {
 	EmbeddedString string
 	EmbeddedInt    int
 }
+
+// PagingSource used for testing
+type PagingSourceTwo struct {
+	Page  int    `json:"page"`
+	Size  int    `json:"size"`
+	Token string `json:"token"`
+
+	EmbeddedString string
+	EmbeddedInt    int
+}

@@ -28,3 +28,5 @@ maps:
     map_overrides:
     - source_name: "PagingSource"
       target_name: "PagingTarget"
+    - source_name: "PagingSourceTwo"
+      target_name: "PagingTargetTwo"
