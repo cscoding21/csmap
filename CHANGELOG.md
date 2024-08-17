@@ -1,3 +1,10 @@
+## v0.3.1 (2024-08-17)
+
+### Fix
+
+- update test for embedded fields
+- update mapping function to handle embedded structs
+
 ## v0.3.0 (2024-07-31)
 
 ### Feat
