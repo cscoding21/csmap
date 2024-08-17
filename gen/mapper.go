@@ -79,6 +79,11 @@ func Generate(manifestPath string, mcfg *packages.Config) error {
 
 					for _, embeddedTargetField := range embeddedTargetStruct.Fields {
 						embeddedSourceField := sourceStruct.GetField(embeddedTargetField.Name)
+						if embeddedSourceField == nil {
+							log.Printf("X No corresponding embedded source field for %s\n", embeddedTargetField.Name)
+							continue
+						}
+
 						log.Printf("- Found embedded source field %s\n", embeddedSourceField.Name)
 						line := fmt.Sprintf("%s,\n", getAssignmentString(*sourceStruct, embeddedTargetStruct, embeddedSourceField, embeddedTargetField))
 						em.WriteString(line)
