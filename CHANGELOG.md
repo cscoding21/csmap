@@ -1,3 +1,9 @@
+## v0.3.3 (2024-08-22)
+
+### Fix
+
+- add new common struct library to correctly map objects defined in other packages
+
 ## v0.3.2 (2024-08-17)
 
 ### Fix
