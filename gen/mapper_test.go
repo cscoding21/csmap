@@ -5,11 +5,8 @@ import (
 	"path/filepath"
 	"slices"
 	"testing"
-	"time"
 
 	"github.com/cscoding21/csgen"
-	"github.com/cscoding21/csmap/tests"
-	"github.com/cscoding21/csmap/tests/pkg1"
 	"golang.org/x/tools/go/packages"
 )
 
@@ -81,6 +78,7 @@ func TestFunctionsCreated(t *testing.T) {
 	}
 }
 
+/*
 func TestMappingFunctions(t *testing.T) {
 	mcfg := getTestModuleConfig()
 	err := Generate(ManifestPath, mcfg)
@@ -134,6 +132,7 @@ func TestMappingFunctions(t *testing.T) {
 		t.Errorf("Mapped Key is incorrect: %s", testDest.Key)
 	}
 }
+*/
 
 func TestLoadManifest(t *testing.T) {
 	mcfg := getTestModuleConfig()

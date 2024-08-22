@@ -71,10 +71,13 @@ func Generate(manifestPath string, mcfg *packages.Config) error {
 				log.Printf("Processing embedded structs\n")
 				for _, embeddedTargetStruct := range targetStruct.EmbeddedStructs {
 					log.Printf("- Embedded struct %s\n", embeddedTargetStruct.Name)
+					sub := manifest.GetCommonStruct(embeddedTargetStruct.Name)
+					if sub != nil {
+						embeddedTargetStruct = sub.Struct
+					}
 
 					em := strings.Builder{}
 					em.WriteString("\n\n//---Embedded Structs\n")
-					// PagingTargetEmbedded: pkgco.PagingTargetEmbedded{
 					em.WriteString(fmt.Sprintf("%s: %s.%s {\n", embeddedTargetStruct.Name, embeddedTargetStruct.Package, embeddedTargetStruct.Name))
 
 					for _, embeddedTargetField := range embeddedTargetStruct.Fields {
@@ -299,6 +302,16 @@ func LoadManifest(path string, mcfg *packages.Config) Manifest {
 
 	if len(manifest.GeneratorPackage) == 0 {
 		manifest.GeneratorPackage = csgen.InferPackageFromOutputPath(manifest.GeneratorPath)
+	}
+
+	for i, cs := range manifest.CommonStructs {
+		filePath := filepath.Join(manifest.ProjectRoot, cs.Path)
+		structs, err := csgen.GetStructs(filePath)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		manifest.CommonStructs[i].Struct = *csgen.GetStructByName(cs.StructName, structs)
 	}
 
 	for i, m := range manifest.ObjectMaps {

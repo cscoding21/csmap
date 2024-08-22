@@ -1,5 +1,7 @@
 package pkgco
 
+import "time"
+
 // PagingSource used for testing
 type PagingSource struct {
 	Page  int    `json:"page"`
@@ -22,4 +24,7 @@ type PagingSourceTwo struct {
 
 	EmbeddedString string
 	EmbeddedInt    int
+
+	ID        string
+	CreatedAt time.Time
 }

@@ -2,6 +2,11 @@ project_root: "/home/jeph/projects/cscoding21/csmap"
 generator_path: "tests"
 #generator_package: "tests"
 
+common_structs:
+  - package_name: common
+    struct_name: ControlFields
+    path: tests/common/cf.go
+
 # source and destination pathes are relative to project root
 maps:
   # Test of 2 objects with different names 
@@ -25,6 +30,9 @@ maps:
   - name: "source_pkgco"
     source_path: "tests/pkgco/test1.go"
     target_path: "tests/pkgco/test2.go"
+    imports: 
+    - "github.com/cscoding21/csmap/tests/common"
+    - "github.com/cscoding21/csmap/tests/pkgco"
     map_overrides:
     - source_name: "PagingSource"
       target_name: "PagingTarget"

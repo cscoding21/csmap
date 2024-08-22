@@ -1,5 +1,9 @@
 package pkgco
 
+import (
+	"github.com/cscoding21/csmap/tests/common"
+)
+
 // PagingTarget used for testing
 type PagingTarget struct {
 	Page  int    `json:"page"`
@@ -20,4 +24,6 @@ type PagingTargetTwo struct {
 	Token string `json:"token"`
 
 	PagingTargetEmbedded
+
+	common.ControlFields
 }

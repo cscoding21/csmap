@@ -6,16 +6,36 @@ import (
 
 // Manifest strongly typed respresentation of the manifest file.
 type Manifest struct {
-	ProjectRoot      string      `yaml:"project_root"`
-	GeneratorPath    string      `yaml:"generator_path"`
-	GeneratorPackage string      `yaml:"generator_package"`
-	ObjectMaps       []ObjectMap `yaml:"maps"`
+	ProjectRoot      string         `yaml:"project_root"`
+	GeneratorPath    string         `yaml:"generator_path"`
+	GeneratorPackage string         `yaml:"generator_package"`
+	ObjectMaps       []ObjectMap    `yaml:"maps"`
+	CommonStructs    []CommonStruct `yaml:"common_structs"`
 }
 
 // MapOverride struct that represents an explicitly specified object mapping, overriding the defailt name matching
 type MapOverride struct {
 	SourceName string `yaml:"source_name"`
 	TargetName string `yaml:"target_name"`
+}
+
+// CommonStruct a container for structs that have global application when creating maps
+type CommonStruct struct {
+	PackageName string       `yaml:"package_name"`
+	StructName  string       `yaml:"struct_name"`
+	Path        string       `yaml:"path"`
+	Struct      csgen.Struct `yaml:"struct"`
+}
+
+// GetCommonStruct return a common struct by name if it exists and nil otherwise
+func (m *Manifest) GetCommonStruct(name string) *CommonStruct {
+	for _, s := range m.CommonStructs {
+		if s.StructName == name {
+			return &s
+		}
+	}
+
+	return nil
 }
 
 // ObjectMap is a struct that contains the source and destination paths for a single mapping.
