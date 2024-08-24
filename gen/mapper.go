@@ -177,7 +177,11 @@ func getSimpleAssignment(source csgen.Field, target csgen.Field) string {
 	indicator := csgen.GetFieldIndicator(source, target)
 
 	if source.Type != target.Type && indicator == "" {
-		return fmt.Sprintf("%s: %s(r.%s)", rawTargetName, target.Type, rawTargetName)
+		if source.Type == "interface{}" {
+			return fmt.Sprintf("%s: r.%s.(%s)", rawTargetName, rawTargetName, target.Type)
+		} else {
+			return fmt.Sprintf("%s: %s(r.%s)", rawTargetName, target.Type, rawTargetName)
+		}
 	}
 
 	return fmt.Sprintf("%s: %sr.%s", rawTargetName, indicator, rawTargetName)

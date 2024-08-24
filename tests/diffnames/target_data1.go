@@ -2,10 +2,11 @@ package diffnames
 
 // TestTarget used for testing
 type TestTarget struct {
-	ID       string
-	Name     *string
-	Age      int
-	Location LocationTarget
+	ID        string
+	Name      *string
+	Age       int
+	Location  LocationTarget
+	Interface string
 }
 
 // LocationTarget used for testing

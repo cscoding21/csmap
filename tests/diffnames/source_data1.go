@@ -2,10 +2,11 @@ package diffnames
 
 // TestSource used for testing
 type TestSource struct {
-	ID       string
-	Name     string
-	Age      *int
-	Location LocationSource
+	ID        string
+	Name      string
+	Age       *int
+	Location  LocationSource
+	Interface interface{}
 }
 
 // LocationSource used for testing
