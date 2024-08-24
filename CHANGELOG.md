@@ -1,3 +1,9 @@
+## v0.3.4 (2024-08-24)
+
+### Fix
+
+- fix type coersion when source is an interface and target is not
+
 ## v0.3.3 (2024-08-22)
 
 ### Fix
