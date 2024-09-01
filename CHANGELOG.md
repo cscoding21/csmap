@@ -1,3 +1,9 @@
+## v0.3.5 (2024-09-01)
+
+### Fix
+
+- update object mapping to not overwrite source package qualifier
+
 ## v0.3.4 (2024-08-24)
 
 ### Fix
