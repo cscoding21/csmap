@@ -217,7 +217,7 @@ func getObjectAssignment(source csgen.Field, target csgen.Field, sourcePackage s
 	objectPackage := csgen.ExtractPackageName(rawTargetName)
 
 	if len(objectPackage) > 0 {
-		sourcePackage = objectPackage
+		//sourcePackage = objectPackage
 		targetPackage = objectPackage
 	}
 
